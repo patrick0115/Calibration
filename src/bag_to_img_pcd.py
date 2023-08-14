@@ -8,8 +8,6 @@ import rospkg
 import os
 import time
 
-
-
 # 全局變量來存儲最新的數據
 latest_point_cloud = None
 latest_image = None
