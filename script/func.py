@@ -133,6 +133,7 @@ def find_pose(img_path, mtx, dist, square_size, grid_size,objp):
 
     # 讀取影像
     img = cv2.imread(img_path)
+ 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # 尋找棋盤格角點

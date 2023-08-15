@@ -6,7 +6,7 @@ square_size = 0.0215
 pattern_size = (9, 6)
 # extra_img_path= "./img/new_1.jpg"
 # extra_img_path= "./img/a01.jpg"
-img_path="../raw_data/img/img_0814-30.jpg"
+img_path="../raw_data/img/img_0814-55.jpg"
 pcd_path="../raw_data/pcd/pcd_0814-25.pcd"
 
 pcd_name=pcd_path.split("/")[-1][0:-4]
