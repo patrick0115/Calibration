@@ -91,7 +91,7 @@ def camera_calibration(img_folder_path,marked_img_folder_path, square_size, patt
     images = glob.glob(os.path.join(img_folder_path, "*.png"))
 
     for fname in images:
-        img = cv2.imread(fname)
+        img = cv2.imread(fname, cv2.IMREAD_GRAYSCALE)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
  
         # Find the chess board corners
@@ -137,7 +137,7 @@ def find_pose(img_path, mtx, dist, square_size, grid_size,objp):
 
     # 尋找棋盤格角點
     ret, corners = cv2.findChessboardCorners(gray, (grid_size[0], grid_size[1]), None)
-   
+    
     # print(objp.shape)
     if ret == True:
         _, rvecs, tvecs = cv2.solvePnP(objp, corners, mtx, dist)
@@ -202,14 +202,17 @@ def pcd_to_bin(pcd_file, bin_file):
     # 儲存為 bin 檔
     np_points.astype('float32').tofile(bin_file)
 def show_pcd(pcd_ls):
+    coordinate_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(
+    size=0.3, origin=[0, 0, 0])
     # 建立視窗物件並設置點的大小
     vis = o3d.visualization.Visualizer()
     vis.create_window()
     for i in range(len(pcd_ls)):
         vis.add_geometry(pcd_ls[i])
+    vis.add_geometry(coordinate_frame)
     # 獲取渲染選項並設置點的大小
     render_option = vis.get_render_option()
-    render_option.point_size = 1.0  # 設置點的大小
+    render_option.point_size = 5.0  # 設置點的大小
 
     # 顯示點雲
     vis.run()

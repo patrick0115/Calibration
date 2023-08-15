@@ -6,9 +6,10 @@ import argparse
 def create_points(rows=9, columns=6, spacing=0.0245,origin=[0,0,0],rotate_angle=[85,90,90]):
     points = np.zeros((rows*columns, 3))
     # x, y = np.meshgrid(np.linspace(0,-0.0245*(columns-1), columns), np.linspace(0, -0.0245*(rows-1), rows))
-    x, y = np.meshgrid(np.linspace(0, -0.0245*(rows-1), rows),np.linspace(0,-0.0245*(columns-1), columns))
-    points[:, :2] = np.stack((x.reshape(-1), y.reshape(-1)), axis=-1)
+    y, z = np.meshgrid(np.linspace(0,spacing*(columns-1), columns),np.linspace(0, spacing*(rows-1), rows))
+    points[:, 1:3] = np.stack((y.reshape(-1), z.reshape(-1)), axis=-1)
     # 根據原點調整點的位置
+
     points += np.array(origin)
 
     points = rotate_points(points, 'x', np.radians(rotate_angle[0]),origin)
@@ -37,19 +38,19 @@ def rotate_points(points, axis, angle ,center):
 
 def parse_args():
     parse = argparse.ArgumentParser()
-    parse.add_argument('--pcd_path', type=str, default="./pcd/amr_1.pcd",choices=["./pcd/amr_1.pcd", "./pcd/a01.pcd","./pcd/new_1.pcd"])
+    parse.add_argument('--pcd_path', type=str, default="../raw_data/pcd/pcd_0814-25.pcd",choices=["../raw_data/pcd/pcd_0814-25.pcd", "./pcd/a01.pcd","./pcd/new_1.pcd"])
     return parse.parse_args()
 
 if __name__ == '__main__':
     args = parse_args()
     pcd_path=args.pcd_path
-    pcd_name=pcd_path.split("/")[2][0:-4]
-    save_path=os.path.join("./cal_file/",pcd_name)
+    pcd_name=pcd_path.split("/")[-1][0:-4]
+    save_path=os.path.join("./cal_file/lidar_cam_cal",pcd_name)
  
     # 設定原始點雲 x、y、z三軸的範圍，範圍的格式為[min, max]
-    x_range = [-4.5, 0]
-    y_range = [-3, 2.5]
-    z_range = [-3 ,1]
+    x_range = [ 0, 10]
+    y_range = [-0.8, 0.8]
+    z_range = [0, 0.5]
     # x_range = None
     # y_range = None
     # z_range = None
@@ -66,11 +67,12 @@ if __name__ == '__main__':
         origin=[0.654,0.25,0.36]
         rotate_angle=[95,45.5,90]
     ### amr_1 :
-    elif pcd_path=="./pcd/amr_1.pcd":
-        origin=[0.654,0.25,0.36]
-        rotate_angle=[95,45.5,90]
+    elif pcd_path=="../raw_data/pcd/pcd_0814-25.pcd":
+        # origin=[0.45,-0.03,0]
+        origin=[0.29,-0.16,0.03]
+        rotate_angle=[0,-10,0]
     
-    points = create_points(rows=9, columns=6, spacing=0.0245,origin=origin,rotate_angle=rotate_angle)
+    points = create_points(rows=9, columns=6, spacing=0.0215,origin=origin,rotate_angle=rotate_angle)
     
     create_path_if_not_exists(save_path)
 
@@ -89,7 +91,7 @@ if __name__ == '__main__':
     colors[5] = [0, 1, 0]  # 將索引為 5 的點設置為綠色
     pcd_ls=[org_pcd,created_pcd]
     created_pcd.colors = o3d.utility.Vector3dVector(colors)
-    show_pcd(pcd_ls)
+    # show_pcd(pcd_ls)
 
 
 
