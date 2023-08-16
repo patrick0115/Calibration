@@ -15,9 +15,9 @@ latest_image = None
 def save_files(event):
     global latest_point_cloud, latest_image
 
-    timestamp = time.strftime("%m%d-%S")
+    timestamp = time.strftime("%m%d%H%M%S")
     rospack = rospkg.RosPack()
-    package_path = rospack.get_path('yrl_to_cloud')
+    package_path = rospack.get_path('calibration')
     img_save_path = os.path.join(package_path,"raw_data","img","img_"+timestamp+".jpg")
     pcd_save_path = os.path.join(package_path,"raw_data","pcd","pcd_"+timestamp+".pcd")
 
@@ -67,7 +67,7 @@ def main():
     rospy.Subscriber('/usb_cam/image_raw', Image, image_callback)
 
     # 設置計時器，每5秒調用一次save_files函數
-    rospy.Timer(rospy.Duration(5), save_files)
+    rospy.Timer(rospy.Duration(1), save_files)
 
     # 主循環
     rospy.spin()

@@ -1,6 +1,6 @@
 <launch>
   <!-- 定義bag_file參數，並設置預設值 -->
-  <arg name="bag_file" default="$(find calibration)/bag/2023-08-11-15-48-36.bag"/>
+  <arg name="bag_file" default="$(find calibration)/raw_data/bag/corridor_cal/2023-08-15-20-55-46.bag"/>
 
   <!-- 播放bag檔案 -->
   <node name="play_bag" pkg="rosbag" type="play" args="-l $(arg bag_file)"/>
