@@ -125,9 +125,24 @@ def write_txt(mtx, dist, filename):
         np.savetxt(f, dist, fmt="%f")
     print('檔案寫入完成。')
     
+def test_corner(img_path,square_column,square_row,show=False):
+    flags = cv2.CALIB_CB_ADAPTIVE_THRESH | cv2.CALIB_CB_NORMALIZE_IMAGE
+    # 讀取影像
+    img = cv2.imread(img_path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # 尋找棋盤格角點
+    ret, corners = cv2.findChessboardCorners(gray, (square_column, square_row), flags=flags)
+    if ret == True:
+        if show:
+            cv2.drawChessboardCorners(img, (square_column, square_row), corners, ret)
+            cv2.imshow('Chessboard Corners', img)
+            cv2.waitKey(0)
+    
+    return ret
+
 def find_pose(img_path, mtx, dist, square_size, grid_size,objp ,show=False):
     print('正在找尋旋轉向量和平移向量...')
-
+    flags = cv2.CALIB_CB_ADAPTIVE_THRESH | cv2.CALIB_CB_NORMALIZE_IMAGE
     # 將物件點與方格尺寸進行縮放
     objp=objp.reshape(-1,1,3)
 
@@ -136,18 +151,36 @@ def find_pose(img_path, mtx, dist, square_size, grid_size,objp ,show=False):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # 尋找棋盤格角點
-    ret, corners = cv2.findChessboardCorners(gray, (grid_size[0], grid_size[1]), None)
-    
-    # print(objp.shape)
+    ret, corners = cv2.findChessboardCorners(gray, (grid_size[0], grid_size[1]), flags=flags)
+
+    corners_c=corners.copy()
+    for i in range(9):
+        for j in range(6): 
+            corners[5-j+6*i]=corners_c[i+j*9]
+
+    print(corners.shape)
     if ret == True:
         _, rvecs, tvecs = cv2.solvePnP(objp, corners, mtx, dist)
 
         # 如果show參數為True，則繪製並顯示角點
         if show:
-            cv2.drawChessboardCorners(img, (grid_size[0], grid_size[1]), corners, ret)
+            # 繪製角點
+          
+            for i,corner in enumerate(corners):
+                # 將角點座標轉換為整數
+                x, y = tuple(map(int, corner[0]))
+                # 使用cv2.circle在每個角點位置畫一個小圓圈
+                if i ==0:
+                    cv2.circle(img, (x, y), 5, (0, 0, 255), -1)
+                elif i ==5:
+                    cv2.circle(img, (x, y), 5, (0, 255, 0), -1)
+                else:
+                    cv2.circle(img, (x, y), 5, (255, 0, 0), -1)
+          
+            # cv2.drawChessboardCorners(img, (grid_size[0], grid_size[1]), corners, ret)
             cv2.imshow('Chessboard Corners', img)
             cv2.waitKey(0)
-            cv2.imwrite('corners_image.png', img)
+            # cv2.imwrite('corners_image.png', img)
             print('角點圖像已保存為corners_image.png')
 
         print('找尋完成。')
@@ -215,6 +248,8 @@ def show_pcd(pcd_ls):
     # 建立視窗物件並設置點的大小
     vis = o3d.visualization.Visualizer()
     vis.create_window()
+    vis.get_render_option().background_color = np.asarray([0, 0, 0])  # 白色背景
+
     for i in range(len(pcd_ls)):
         vis.add_geometry(pcd_ls[i])
     vis.add_geometry(coordinate_frame)

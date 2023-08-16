@@ -53,20 +53,19 @@ def draw_image(image):
 
 if __name__ == '__main__':
 # Load data
-    img_path = "./img/a01.jpg"
-    pcd_path = "./pcl/a01.pcd"
-    img_path = "./img/new_1.jpg"
-    pcd_path = "./pcl/new_1.pcd"
+    pcd_path="../raw_data/pcd/pcd_0816163440.pcd"
+    img_path="../raw_data/img/img_0816163440.jpg"
+    ext_name="pcd_0816135539"
     img, pcd_np = load_image_and_point_cloud(img_path, pcd_path)
-    img_name = pcd_path.split("/")[2][0:-4]
+    pcd_name = pcd_path.split("/")[-1][0:-4]
     mtx, dist = load_txt('cal_file.txt')
-    rvecs, tvecs = load_rvecs_tvecs(os.path.join("cal_file", img_name, img_name+'_extrinsic.txt'))
+    rvecs, tvecs = load_rvecs_tvecs(os.path.join("cal_file", "lidar_cam_cal", ext_name,ext_name+'_extrinsic.txt'))
     img_copy = np.copy(img)
     # Project points
-    # points_2d = project_points(pcd_np, mtx, dist, rvecs, tvecs,True)
-    points_2d,points_2d_cv= project_2points(pcd_np, mtx, dist, rvecs, tvecs,True)
+    points_2d = project_points(pcd_np, mtx, dist, rvecs, tvecs,True)
+    # points_2d,points_2d_cv= project_2points(pcd_np, mtx, dist, rvecs, tvecs,True)
     img1=create_img(img,points_2d,"Use cv2.projectPoints")
-    img2=create_img(img_copy,points_2d_cv,"Project")
+    img2=create_img(img_copy,points_2d,"Project")
     img3 = np.hstack((img1, img2))
     draw_image(img3)
 
@@ -85,8 +84,16 @@ if __name__ == '__main__':
 
     # 建立點雲並設置顏色
     # 建立點雲並設置顏色
+    x_range = [ 0, 5]
+    y_range = [-2, 2]
+    z_range = [0, 3]
+    bound_min = [x_range[0], y_range[0], z_range[0]]
+    bound_max = [x_range[1], y_range[1], z_range[1]]
+
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(pcd_np)
     pcd.colors = o3d.utility.Vector3dVector(colors)
+    pcd = pcd.crop(
+        o3d.geometry.AxisAlignedBoundingBox(min_bound=bound_min, max_bound=bound_max))
     # 顯示彩色點雲
     o3d.visualization.draw_geometries([pcd])
