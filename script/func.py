@@ -125,7 +125,7 @@ def write_txt(mtx, dist, filename):
         np.savetxt(f, dist, fmt="%f")
     print('檔案寫入完成。')
     
-def find_pose(img_path, mtx, dist, square_size, grid_size,objp):
+def find_pose(img_path, mtx, dist, square_size, grid_size,objp ,show=False):
     print('正在找尋旋轉向量和平移向量...')
 
     # 將物件點與方格尺寸進行縮放
@@ -133,7 +133,6 @@ def find_pose(img_path, mtx, dist, square_size, grid_size,objp):
 
     # 讀取影像
     img = cv2.imread(img_path)
- 
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     # 尋找棋盤格角點
@@ -142,6 +141,14 @@ def find_pose(img_path, mtx, dist, square_size, grid_size,objp):
     # print(objp.shape)
     if ret == True:
         _, rvecs, tvecs = cv2.solvePnP(objp, corners, mtx, dist)
+
+        # 如果show參數為True，則繪製並顯示角點
+        if show:
+            cv2.drawChessboardCorners(img, (grid_size[0], grid_size[1]), corners, ret)
+            cv2.imshow('Chessboard Corners', img)
+            cv2.waitKey(0)
+            cv2.imwrite('corners_image.png', img)
+            print('角點圖像已保存為corners_image.png')
 
         print('找尋完成。')
         return rvecs, tvecs
