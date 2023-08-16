@@ -38,39 +38,32 @@ def rotate_points(points, axis, angle ,center):
 
 def parse_args():
     parse = argparse.ArgumentParser()
-    parse.add_argument('--pcd_path', type=str, default="../raw_data/pcd/pcd_0814-25.pcd",choices=["../raw_data/pcd/pcd_0814-25.pcd", "./pcd/a01.pcd","./pcd/new_1.pcd"])
+    parse.add_argument('--pcd_path', type=str, default="../raw_data/pcd/pcd_0816135539.pcd")
+    parse.add_argument('--img_path', type=str, default="../raw_data/img/img_0816135539.jpg")
+    parse.add_argument('--square_size', type=float, default=0.0218)
+    parse.add_argument('--square_column', type=int, default=9)
+    parse.add_argument('--square_row', type=int, default=6)
+    # parse.add_argument('--raw_path', type=str, default="../raw_data/")
     return parse.parse_args()
 
 if __name__ == '__main__':
     args = parse_args()
+
+    assert test_corner(args.img_path,args.square_column,args.square_row) ,"Unable to find corners. Please use another image."
     pcd_path=args.pcd_path
     pcd_name=pcd_path.split("/")[-1][0:-4]
     save_path=os.path.join("./cal_file/lidar_cam_cal",pcd_name)
  
     # 設定原始點雲 x、y、z三軸的範圍，範圍的格式為[min, max]
-    x_range = [ 0, 10]
-    y_range = [-0.8, 0.8]
+    x_range = [ 0, 1.5]
+    y_range = [-0.22, 0.22]
     z_range = [0, 0.5]
-    # x_range = None
-    # y_range = None
-    # z_range = None
 
-    org_pcd=read_edit_pt(pcd_path,color=[0, 0, 0],x_range = x_range,y_range = y_range,z_range = z_range)
+    org_pcd=read_edit_pt(pcd_path,color=[1, 1, 1],x_range = x_range,y_range = y_range,z_range = z_range)
     
-    # 創建棋盤格坐標並設置顏色
-    ### new_1 :
-    if pcd_path=="./pcd/new_1.pcd":
-        origin=[1.35,0.37,0.18]
-        rotate_angle=[85,90,90]
-    ### a01 :
-    elif pcd_path=="./pcd/a01.pcd":
-        origin=[0.654,0.25,0.36]
-        rotate_angle=[95,45.5,90]
-    ### amr_1 :
-    elif pcd_path=="../raw_data/pcd/pcd_0814-25.pcd":
-        # origin=[0.45,-0.03,0]
-        origin=[0.29,-0.16,0.03]
-        rotate_angle=[0,-10,0]
+
+    origin=[0.40,0.11,0.245]
+    rotate_angle=[90,0,0]
     
     points = create_points(rows=9, columns=6, spacing=0.0215,origin=origin,rotate_angle=rotate_angle)
     
@@ -85,13 +78,14 @@ if __name__ == '__main__':
     ## show pcd
     created_pcd = o3d.geometry.PointCloud()
     created_pcd.points = o3d.utility.Vector3dVector(points)
+    # 將第一組點表示為小球
     colors = np.zeros((54, 3)) 
     colors[:] = [0, 0, 1]  # 將所有點設置為藍色
     colors[0] = [1, 0, 0]  # 將索引為 0 的點設置為紅色
     colors[5] = [0, 1, 0]  # 將索引為 5 的點設置為綠色
     pcd_ls=[org_pcd,created_pcd]
     created_pcd.colors = o3d.utility.Vector3dVector(colors)
-    # show_pcd(pcd_ls)
+    show_pcd(pcd_ls)
 
 
 
