@@ -177,10 +177,8 @@ def find_pose(img_path, mtx, dist, square_size, grid_size,objp ,show=False):
                 else:
                     cv2.circle(img, (x, y), 5, (255, 0, 0), -1)
           
-            # cv2.drawChessboardCorners(img, (grid_size[0], grid_size[1]), corners, ret)
             cv2.imshow('Chessboard Corners', img)
             cv2.waitKey(0)
-            # cv2.imwrite('corners_image.png', img)
             print('角點圖像已保存為corners_image.png')
 
         print('找尋完成。')

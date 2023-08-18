@@ -22,19 +22,7 @@ def project_points(point_cloud, mtx, dist, rvecs, tvecs,cv):
 
     return projected_points
 
-def project_2points(point_cloud, mtx, dist, rvecs, tvecs,cv):
-    ## Use CV
-    projected_points_cv, _ = cv2.projectPoints(point_cloud, rvecs, tvecs, mtx,dist)
-    projected_points_cv = np.squeeze(projected_points_cv, axis=1)
-    ## Use Project
-    R, _ = cv2.Rodrigues(rvecs)
-    RT = np.column_stack((R, tvecs))
-    P = np.dot(mtx, RT)
-    point_cloud_homogeneous = np.column_stack((point_cloud, np.ones(point_cloud.shape[0])))
-    projected_points = np.dot(P, point_cloud_homogeneous.T).T
-    projected_points = projected_points[:, :2] / projected_points[:, 2, np.newaxis]
 
-    return projected_points,projected_points_cv
 
 def create_img(image, points,word):
     cv2.putText(image, word, (80, 450), cv2.FONT_HERSHEY_SIMPLEX , 1, (0, 0, 0), 2, cv2.LINE_AA)
@@ -53,8 +41,8 @@ def draw_image(image):
 
 if __name__ == '__main__':
 # Load data
-    pcd_path="../raw_data/pcd/pcd_0816163440.pcd"
-    img_path="../raw_data/img/img_0816163440.jpg"
+    pcd_path="../raw_data/pcd/pcd_0816164051.pcd"
+    img_path="../raw_data/img/img_0816164051.jpg"
     ext_name="pcd_0816135539"
     img, pcd_np = load_image_and_point_cloud(img_path, pcd_path)
     pcd_name = pcd_path.split("/")[-1][0:-4]
@@ -63,7 +51,6 @@ if __name__ == '__main__':
     img_copy = np.copy(img)
     # Project points
     points_2d = project_points(pcd_np, mtx, dist, rvecs, tvecs,True)
-    # points_2d,points_2d_cv= project_2points(pcd_np, mtx, dist, rvecs, tvecs,True)
     img1=create_img(img,points_2d,"Use cv2.projectPoints")
     img2=create_img(img_copy,points_2d,"Project")
     img3 = np.hstack((img1, img2))
@@ -84,9 +71,9 @@ if __name__ == '__main__':
 
     # 建立點雲並設置顏色
     # 建立點雲並設置顏色
-    x_range = [ 0, 5]
-    y_range = [-2, 2]
-    z_range = [0, 3]
+    x_range = [ -5, 10]
+    y_range = [-10, 10]
+    z_range = [-5, 5]
     bound_min = [x_range[0], y_range[0], z_range[0]]
     bound_max = [x_range[1], y_range[1], z_range[1]]
 
