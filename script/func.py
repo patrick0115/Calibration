@@ -153,13 +153,15 @@ def find_pose(img_path, mtx, dist, square_size, grid_size,objp ,show=False):
     # 尋找棋盤格角點
     ret, corners = cv2.findChessboardCorners(gray, (grid_size[0], grid_size[1]), flags=flags)
 
-    corners_c=corners.copy()
-    for i in range(9):
-        for j in range(6): 
-            corners[5-j+6*i]=corners_c[i+j*9]
+  
 
-    print(corners.shape)
     if ret == True:
+        corners_c=corners.copy()
+        for i in range(9):
+            for j in range(6): 
+                corners[5-j+6*i]=corners_c[i+j*9]
+
+        print(corners.shape)
         _, rvecs, tvecs = cv2.solvePnP(objp, corners, mtx, dist)
 
         # 如果show參數為True，則繪製並顯示角點
@@ -176,7 +178,7 @@ def find_pose(img_path, mtx, dist, square_size, grid_size,objp ,show=False):
                     cv2.circle(img, (x, y), 5, (0, 255, 0), -1)
                 else:
                     cv2.circle(img, (x, y), 5, (255, 0, 0), -1)
-          
+            img = cv2.resize(img, (767, 1365))
             cv2.imshow('Chessboard Corners', img)
             cv2.waitKey(0)
             print('角點圖像已保存為corners_image.png')
