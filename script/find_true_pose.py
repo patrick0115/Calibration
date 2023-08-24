@@ -38,12 +38,11 @@ def rotate_points(points, axis, angle ,center):
 
 def parse_args():
     parse = argparse.ArgumentParser()
-    parse.add_argument('--pcd_path', type=str, default="../raw_data/pcd/pcd_0816135539.pcd")
-    parse.add_argument('--img_path', type=str, default="../raw_data/img/img_0816135539.jpg")
-    parse.add_argument('--square_size', type=float, default=0.0218)
-    parse.add_argument('--square_column', type=int, default=9)
-    parse.add_argument('--square_row', type=int, default=6)
-    # parse.add_argument('--raw_path', type=str, default="../raw_data/")
+    parse.add_argument('--pcd_path', type=str, default="../raw_data/pcd/pcd_20230824_170141.pcd")
+    parse.add_argument('--img_path', type=str, default="../raw_data/img/img_20230824_170141.jpg")
+    parse.add_argument('--square_size', type=float, default=0.04855)
+    parse.add_argument('--square_column', type=int, default=7)
+    parse.add_argument('--square_row', type=int, default=4)
     return parse.parse_args()
 
 if __name__ == '__main__':
@@ -55,17 +54,17 @@ if __name__ == '__main__':
     save_path=os.path.join("./cal_file/lidar_cam_cal",pcd_name)
  
     # 設定原始點雲 x、y、z三軸的範圍，範圍的格式為[min, max]
-    x_range = [ 0, 1.5]
-    y_range = [-0.22, 0.22]
-    z_range = [0, 0.5]
-
+    x_range = [ 0.4, 1.5]
+    y_range = [-1.0, 1.0]
+    z_range = [0, 1.5]
+  
     org_pcd=read_edit_pt(pcd_path,color=[1, 1, 1],x_range = x_range,y_range = y_range,z_range = z_range)
     
 
     origin=[0.40,0.11,0.245]
     rotate_angle=[90,0,0]
     
-    points = create_points(rows=9, columns=6, spacing=0.0215,origin=origin,rotate_angle=rotate_angle)
+    points = create_points(rows=args.square_column, columns=args.square_row, spacing=args.square_size,origin=origin,rotate_angle=rotate_angle)
     
     create_path_if_not_exists(save_path)
 
