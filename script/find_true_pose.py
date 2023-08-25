@@ -5,7 +5,6 @@ import os
 import argparse
 def create_points(rows=9, columns=6, spacing=0.0245,origin=[0,0,0],rotate_angle=[85,90,90]):
     points = np.zeros((rows*columns, 3))
-    # x, y = np.meshgrid(np.linspace(0,-0.0245*(columns-1), columns), np.linspace(0, -0.0245*(rows-1), rows))
     y, z = np.meshgrid(np.linspace(0,spacing*(columns-1), columns),np.linspace(0, spacing*(rows-1), rows))
     points[:, 1:3] = np.stack((y.reshape(-1), z.reshape(-1)), axis=-1)
     # 根據原點調整點的位置
@@ -17,7 +16,25 @@ def create_points(rows=9, columns=6, spacing=0.0245,origin=[0,0,0],rotate_angle=
     points = rotate_points(points, 'z', np.radians(rotate_angle[2]),origin)
 
     return points 
-    
+
+
+def create_points1(rows=9, columns=6, spacing=0.0245, origin=[0,0,0], rotate_angle=[85,90,90], extra_width=0, extra_length=0):
+    total_rows = rows + 2
+    total_columns = columns + 2
+    points = np.zeros((total_rows * total_columns, 3))
+    y, z = np.meshgrid(np.linspace(-extra_length, spacing * (columns - 1) + extra_length, total_columns),
+                       np.linspace(-extra_width, spacing * (rows - 1) + extra_width, total_rows))
+    points[:, 1:3] = np.stack((y.reshape(-1), z.reshape(-1)), axis=-1)
+
+    # 根據原點調整點的位置
+    points += np.array(origin)
+
+    points = rotate_points(points, 'x', np.radians(rotate_angle[0]), origin)
+    points = rotate_points(points, 'y', np.radians(rotate_angle[1]), origin)
+    points = rotate_points(points, 'z', np.radians(rotate_angle[2]), origin)
+
+    return points
+
 def rotate_points(points, axis, angle ,center):
     # 將點雲的坐標系移動到旋轉中心
     points_centered = points - center
@@ -61,11 +78,11 @@ if __name__ == '__main__':
     org_pcd=read_edit_pt(pcd_path,color=[1, 1, 1],x_range = x_range,y_range = y_range,z_range = z_range)
     
 
-    origin=[0.40,0.11,0.245]
+    origin=[1.3,0.1,0.22]
     rotate_angle=[90,0,0]
     
     points = create_points(rows=args.square_column, columns=args.square_row, spacing=args.square_size,origin=origin,rotate_angle=rotate_angle)
-    
+    points =create_points1(rows=args.square_column, columns=args.square_row, spacing=args.square_size,origin=origin,rotate_angle=rotate_angle, extra_width=0.5, extra_length=0.5)
     create_path_if_not_exists(save_path)
 
     with open(os.path.join(save_path,pcd_name+"_org_rot.txt") , "w") as file:
