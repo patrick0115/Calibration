@@ -243,8 +243,9 @@ def pcd_to_bin(pcd_file, bin_file):
     # 儲存為 bin 檔
     np_points.astype('float32').tofile(bin_file)
 def show_pcd(pcd_ls):
-    coordinate_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(
-    size=0.3, origin=[0, 0, 0])
+    # xyz軸
+    # coordinate_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(
+    # size=0.3, origin=[0, 0, 0])
     # 建立視窗物件並設置點的大小
     vis = o3d.visualization.Visualizer()
     vis.create_window()
@@ -252,7 +253,7 @@ def show_pcd(pcd_ls):
 
     for i in range(len(pcd_ls)):
         vis.add_geometry(pcd_ls[i])
-    vis.add_geometry(coordinate_frame)
+    # vis.add_geometry(coordinate_frame)
     # 獲取渲染選項並設置點的大小
     render_option = vis.get_render_option()
     render_option.point_size = 5.0  # 設置點的大小
