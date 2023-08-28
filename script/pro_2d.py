@@ -48,21 +48,25 @@ if __name__ == '__main__':
 
     mtx, dist = load_txt('cal_file.txt')
     rvecs, tvecs = load_rvecs_tvecs(os.path.join("cal_file", "lidar_cam_cal", pcd_name,pcd_name+'_extrinsic.txt'))
+    
     img_copy = np.copy(img)
-
     # Project points
     points_2d = project_points(pcd_np, mtx, dist, rvecs, tvecs,False)
-    img1=create_img(img,points_2d,"Use cv2.projectPoints")
-    img2=create_img(img_copy,points_2d,"Project")
-    img3 = np.hstack((img1, img2))
+    img_pro_cv=create_img(img,points_2d,"Use cv2.projectPoints")
+    img_pro=create_img(img_copy,points_2d,"Project")
+    img_fusion = np.hstack((img_pro_cv, img_pro))
     # draw_image(img3)
 
 
     # 假設你已經有了點雲和2D點的坐標
-
     points_2d = np.round(points_2d).astype(int)  # 取整數像素坐標
     img = cv2.imread(img_path)
-    img = cv2.flip(img, 1)
+    height, width = img.shape[:2]
+    image_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = image_rgb.reshape(-1, 3) / 255.0 
+    img = img.reshape(height, width , 3) 
+    
+
     height, width = img.shape[:2]
     mask = (0 <= points_2d[:, 0]) & (points_2d[:, 0] < width) & (0 <= points_2d[:, 1]) & (points_2d[:, 1] < height)
 
@@ -70,10 +74,9 @@ if __name__ == '__main__':
     # 從圖像中提取顏色
     colors = np.zeros_like(pcd_np)  # 創建一個與點雲相同大小的0數組，用來儲存顏色
     colors[mask] = img[points_2d[mask, 1], points_2d[mask, 0]]  # 只對影像範圍內的點設定顏色
-    colors = colors / 255  # 歸一化到[0, 1]
 
     # 建立點雲並設置顏色
-    x_range = [ -5, 10]
+    x_range = [ 0, 10]
     y_range = [-10, 10]
     z_range = [-5, 5]
     bound_min = [x_range[0], y_range[0], z_range[0]]
@@ -86,3 +89,4 @@ if __name__ == '__main__':
         o3d.geometry.AxisAlignedBoundingBox(min_bound=bound_min, max_bound=bound_max))
     # 顯示彩色點雲
     o3d.visualization.draw_geometries([pcd])
+
