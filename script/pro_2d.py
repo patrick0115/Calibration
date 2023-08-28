@@ -3,10 +3,7 @@ import numpy as np
 import open3d as o3d
 from func import *
 
-def load_image_and_point_cloud(img_path, pcd_path):
-    img = cv2.imread(img_path)
-    pcd_np = pcd_to_numpy(pcd_path)
-    return img, pcd_np
+
 
 def project_points(point_cloud, mtx, dist, rvecs, tvecs,cv):
     if cv:
@@ -37,29 +34,35 @@ def draw_image(image):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-
+def load_image_and_point_cloud(img_path, pcd_path):
+    img = cv2.imread(img_path)
+    pcd_np = pcd_to_numpy(pcd_path)
+    return img, pcd_np
 
 if __name__ == '__main__':
-# Load data
-    pcd_path="../raw_data/pcd/pcd_0816164051.pcd"
-    img_path="../raw_data/img/img_0816164051.jpg"
-    ext_name="pcd_0816135539"
+    # Load data
+    pcd_path="../raw_data/pcd/pcd_20230824_170141.pcd"
+    img_path="../raw_data/img/img_20230824_170141.jpg"
     img, pcd_np = load_image_and_point_cloud(img_path, pcd_path)
     pcd_name = pcd_path.split("/")[-1][0:-4]
+
     mtx, dist = load_txt('cal_file.txt')
-    rvecs, tvecs = load_rvecs_tvecs(os.path.join("cal_file", "lidar_cam_cal", ext_name,ext_name+'_extrinsic.txt'))
+    rvecs, tvecs = load_rvecs_tvecs(os.path.join("cal_file", "lidar_cam_cal", pcd_name,pcd_name+'_extrinsic.txt'))
     img_copy = np.copy(img)
+
     # Project points
-    points_2d = project_points(pcd_np, mtx, dist, rvecs, tvecs,True)
+    points_2d = project_points(pcd_np, mtx, dist, rvecs, tvecs,False)
     img1=create_img(img,points_2d,"Use cv2.projectPoints")
     img2=create_img(img_copy,points_2d,"Project")
     img3 = np.hstack((img1, img2))
-    draw_image(img3)
+    # draw_image(img3)
 
 
     # 假設你已經有了點雲和2D點的坐標
+
     points_2d = np.round(points_2d).astype(int)  # 取整數像素坐標
     img = cv2.imread(img_path)
+    img = cv2.flip(img, 1)
     height, width = img.shape[:2]
     mask = (0 <= points_2d[:, 0]) & (points_2d[:, 0] < width) & (0 <= points_2d[:, 1]) & (points_2d[:, 1] < height)
 
@@ -69,7 +72,6 @@ if __name__ == '__main__':
     colors[mask] = img[points_2d[mask, 1], points_2d[mask, 0]]  # 只對影像範圍內的點設定顏色
     colors = colors / 255  # 歸一化到[0, 1]
 
-    # 建立點雲並設置顏色
     # 建立點雲並設置顏色
     x_range = [ -5, 10]
     y_range = [-10, 10]
