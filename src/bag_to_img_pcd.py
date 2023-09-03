@@ -67,7 +67,7 @@ def main():
     rospy.Subscriber('/usb_cam/image_raw', Image, image_callback)
 
     # 設置計時器，每5秒調用一次save_files函數
-    rospy.Timer(rospy.Duration(3), save_files)
+    rospy.Timer(rospy.Duration(1), save_files)
 
     # 主循環
     rospy.spin()
