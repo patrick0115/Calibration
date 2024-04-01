@@ -16,8 +16,8 @@ def create_rectangle(length, width):
 
 def create_corner(rows=9, columns=6, spacing=0.0245):
     points = np.zeros((rows*columns, 3))
-    y, z = np.meshgrid(np.linspace(-spacing*(rows-1)/2, spacing*(rows-1)/2, rows),
-                    np.linspace(-spacing*(columns-1)/2, spacing*(columns-1)/2, columns))
+    y, z = np.meshgrid(np.linspace(spacing*(rows-1)/2, -spacing*(rows-1)/2, rows),
+                    np.linspace(spacing*(columns-1)/2, -spacing*(columns-1)/2, columns))
     points[:, 1:3] = np.stack((y.reshape(-1), z.reshape(-1)), axis=-1)
 
     return points 
@@ -72,15 +72,15 @@ def draw_corner(points):
     colors[0] = [1, 0, 0]  # 將索引為 0 的點設置為紅色
     colors[5] = [0, 1, 0]  # 將索引為 5 的點設置為綠色
     colors[8] = [0, 1, 1]  # 將索引為 8 的點設置為青色
-    
+    colors[27] = [1, 0, 0]  # 將索引為 8 的點設置為青色
     created_pcd.colors = o3d.utility.Vector3dVector(colors)
 
     return created_pcd
 
 def parse_args():
     parse = argparse.ArgumentParser()
-    parse.add_argument('--pcd_path', type=str, default="../raw_data/pcd/pcd_20230824_170141.pcd")
-    parse.add_argument('--img_path', type=str, default="../raw_data/img/img_20230824_170141.jpg")
+    parse.add_argument('--pcd_path', type=str, default="../raw_data/pcd/pcd_20231020_174517.pcd")
+    parse.add_argument('--img_path', type=str, default="../raw_data/img/img_20231020_174517.jpg")
     parse.add_argument('--square_size', type=float, default=0.04855)
     parse.add_argument('--square_column', type=int, default=7)
     parse.add_argument('--square_row', type=int, default=4)
@@ -97,13 +97,13 @@ if __name__ == '__main__':
 
 
     # 設定原始點雲 x、y、z三軸的範圍，範圍的格式為[min, max]
-    x_range = [ 0.4, 1.5]
+    x_range = [ 0.8, 1.5]
     y_range = [-0.4, 0.4]
-    z_range = [0, 1.5]
+    z_range = [0.4, 1.5]
     
     # 設定原校正版位置
-    origin=[1.29,-0.06,0.24]
-    rotate_angle=[0, 5,-3]
+    origin=[0.965, -0.15,0.71]
+    rotate_angle=[5, 2,-9]
     
     # 創建校正板點雲numpy
     corner_points_np = create_corner(rows=args.square_column, columns=args.square_row, spacing=args.square_size)

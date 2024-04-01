@@ -41,21 +41,26 @@ def load_image_and_point_cloud(img_path, pcd_path):
 
 if __name__ == '__main__':
     # Load data
-    pcd_path="../raw_data/pcd/pcd_20230824_170141.pcd"
-    img_path="../raw_data/img/img_20230824_170141.jpg"
+    pcd_path="../raw_data/pcd/pcd_20231020_194322.pcd"
+    img_path="../raw_data/img/img_20231020_194322.jpg"
+    # pcd_path="../raw_data/pcd/pcd_20231020_174517.pcd"
+    # img_path="../raw_data/img/img_20231020_174517.jpg"
     img, pcd_np = load_image_and_point_cloud(img_path, pcd_path)
     pcd_name = pcd_path.split("/")[-1][0:-4]
 
     mtx, dist = load_txt('cal_file.txt')
-    rvecs, tvecs = load_rvecs_tvecs(os.path.join("cal_file", "lidar_cam_cal", pcd_name,pcd_name+'_extrinsic.txt'))
-    
+    rvecs, tvecs = load_rvecs_tvecs(os.path.join("cal_file", "lidar_cam_cal", "pcd_20231020_174517",'pcd_20231020_174517_extrinsic.txt'))
+    print(mtx)
+    print(dist)
+    print(rvecs)
+    print(tvecs)
     img_copy = np.copy(img)
     # Project points
     points_2d = project_points(pcd_np, mtx, dist, rvecs, tvecs,False)
     img_pro_cv=create_img(img,points_2d,"Use cv2.projectPoints")
     img_pro=create_img(img_copy,points_2d,"Project")
     img_fusion = np.hstack((img_pro_cv, img_pro))
-    # draw_image(img3)
+    draw_image(img_pro_cv)
 
 
     # 假設你已經有了點雲和2D點的坐標
